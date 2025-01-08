@@ -1,6 +1,7 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
-const DesignerCard = ({ profileImage, name, bio }) => {
+const DesignerCard = ({ profileImage, name, bio, designerId }) => {
   return (
     <div className="bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-200 transition-transform transform hover:scale-105 hover:shadow-2xl max-w-sm w-full mx-auto">
       <div className="relative">
@@ -21,13 +22,13 @@ const DesignerCard = ({ profileImage, name, bio }) => {
           {bio || "No bio available"}
         </p>
 
-        {/* Follow Button */}
-        <button className="mt-4 px-6 py-2 text-white bg-pink-600 rounded-full hover:bg-pink-700 transition duration-300 transform hover:scale-105">
-          Follow
-        </button>
+        <Link to={`/designer-profile/${designerId}`}>
+          <button className="mt-4 px-6 py-2 text-white bg-pink-600 rounded-full hover:bg-pink-700 transition duration-300 transform hover:scale-105">
+            View Profile
+          </button>
+        </Link>
       </div>
     </div>
   );
 };
-
 export default DesignerCard;
