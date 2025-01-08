@@ -8,7 +8,7 @@ const App = () => {
   return (
     <Router>
       <div>
-        <Header /> {/* Adjust height as needed */}
+        <Header />
         <Routes>
           <Route path="/designer-dashboard" element={<DesignerDashboard />} />
         </Routes>

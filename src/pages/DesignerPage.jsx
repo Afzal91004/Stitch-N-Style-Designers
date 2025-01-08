@@ -77,7 +77,8 @@ const DesignerPage = () => {
                 key={designer._id}
                 profileImage={designer.profileImage}
                 name={designer.name}
-                // bio={designer.bio}
+                bio={designer.bio}
+                designerId={designer._id}
               />
             ))}
           </div>
