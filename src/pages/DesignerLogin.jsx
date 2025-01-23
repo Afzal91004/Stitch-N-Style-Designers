@@ -20,6 +20,7 @@ const DesignerLogin = () => {
       if (res.data.success) {
         toast.success("Login successful");
         localStorage.setItem("designerToken", res.data.token);
+        localStorage.setItem("userType", res.data.userType);
       } else {
         toast.error(res.data.message);
       }
