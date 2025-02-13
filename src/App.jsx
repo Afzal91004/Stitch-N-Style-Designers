@@ -1,8 +1,10 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Header from "../../Stitch-N-Style-Frontend/src/components/Header";
-import Footer from "../../Stitch-N-Style-Frontend/src/components/Footer";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
 import DesignerDashboard from "./pages/DesignerDashboard";
+import NewOrders from "./pages/NewOrders";
+import UploadDesign from "./pages/UploadDesign";
 
 const App = () => {
   return (
@@ -11,6 +13,9 @@ const App = () => {
         <Header />
         <Routes>
           <Route path="/designer-dashboard" element={<DesignerDashboard />} />
+          <Route path="/" element={<DesignerDashboard />} />
+          <Route path="/get-new-order" element={<NewOrders />} />
+          <Route path="/upload-new-design" element={<UploadDesign />} />
         </Routes>
         <Footer />
       </div>
