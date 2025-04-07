@@ -51,42 +51,6 @@ const Header = () => {
     <div className="relative">
       <div className="flex items-center justify-between px-4 sm:px-8 py-3 bg-white shadow-md font-medium sticky top-0 z-50">
         <div className="flex items-center gap-4">
-          {/* Hamburger Menu - Visible on mobile */}
-          <button
-            className="lg:hidden p-2 hover:bg-gray-100 rounded-full transition-colors"
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          >
-            {isSidebarOpen ? (
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            ) : (
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </svg>
-            )}
-          </button>
-
           {/* Logo */}
           <Link to="/">
             <img
@@ -178,6 +142,42 @@ const Header = () => {
             </div>
           </div>
         </div>
+
+        {/* Hamburger Menu - Visible on mobile */}
+        <button
+          className="lg:hidden p-2 hover:bg-gray-100 rounded-full transition-colors"
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        >
+          {isSidebarOpen ? (
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          ) : (
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+          )}
+        </button>
       </div>
 
       {/* Mobile Sidebar */}
