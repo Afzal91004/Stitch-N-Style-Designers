@@ -1,13 +1,7 @@
 /** @type {import('tailwindcss').Config} */
-export default {
+module.exports = {
   darkMode: ["class"],
-  content: [
-    "./pages/**/*.{ts, js, tsx, jsx}",
-    "./components/**/*.{ts, js, tsx, jsx}",
-    "./app/**/*.{ts, js, tsx, jsx}",
-    "./src/**/*.{ts, js, tsx, jsx}",
-  ],
-  prefix: "",
+  content: ["./index.html", "./src/**/*.{js,jsx}"],
   theme: {
     container: {
       center: true,
@@ -59,12 +53,12 @@ export default {
       },
       keyframes: {
         "accordion-down": {
-          from: { height: "0" },
+          from: { height: 0 },
           to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
           from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: "0" },
+          to: { height: 0 },
         },
       },
       animation: {
@@ -73,5 +67,5 @@ export default {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [require("@tailwindcss/forms"), require("tailwindcss-animate")],
 };

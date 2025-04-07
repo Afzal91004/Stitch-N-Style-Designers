@@ -1,26 +1,21 @@
 import React, { useState, useEffect } from "react";
-import "./NewOrders.css";
+import "./AcceptedOrders.css";
 
-const NewOrders = () => {
+const AcceptedOrders = () => {
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [price, setPrice] = useState("");
-  const [progress, setProgress] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [newStatus, setNewStatus] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (!localStorage.getItem("designerId")) {
-      localStorage.setItem("designerId", "64a7b3d1a85394db7eb9c123");
-    }
-  }, []);
-
-  const fetchOrders = async () => {
+  const fetchAcceptedOrders = async () => {
     try {
+      setLoading(true);
       setError("");
       const response = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/api/designer/custom-orders`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/designer/accepted-orders`,
         {
           method: "GET",
           headers: {
@@ -32,51 +27,44 @@ const NewOrders = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to fetch orders");
+        throw new Error(errorData.message || "Failed to fetch accepted orders");
       }
 
       const data = await response.json();
       setOrders(Array.isArray(data) ? data : data.orders || []);
     } catch (error) {
-      console.error("Error fetching orders:", error);
-      setError("Failed to load orders: " + error.message);
+      console.error("Error fetching accepted orders:", error);
+      setError("Failed to load accepted orders: " + error.message);
       setOrders([]);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchOrders();
+    fetchAcceptedOrders();
   }, []);
 
-  const handleAcceptOrder = async (orderId, price) => {
+  const handleUpdateStatus = async (orderId, status) => {
     try {
       setError("");
       setSuccess("");
 
-      if (!price || isNaN(parseFloat(price)) || parseFloat(price) <= 0) {
-        setError("Please enter a valid price");
-        return;
-      }
-
-      const designerId = localStorage.getItem("designerId");
-      if (!designerId) {
-        setError("Designer ID not found. Please refresh the page.");
+      if (!status) {
+        setError("Please select a status");
         return;
       }
 
       const response = await fetch(
         `${
           import.meta.env.VITE_BACKEND_URL
-        }/api/designer/custom-orders/${orderId}/accept`,
+        }/api/designer/orders/${orderId}/status`,
         {
-          method: "POST",
+          method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            price: parseFloat(price),
-            designerId,
-          }),
+          body: JSON.stringify({ status }),
           credentials: "include",
         }
       );
@@ -84,84 +72,72 @@ const NewOrders = () => {
       const responseData = await response.json();
 
       if (!response.ok) {
-        throw new Error(responseData.message || "Failed to accept order");
+        throw new Error(
+          responseData.message || "Failed to update order status"
+        );
       }
 
-      setSuccess("Bid placed successfully!");
-      fetchOrders();
+      setSuccess("Order status updated successfully!");
+      fetchAcceptedOrders();
       setSelectedOrder(null);
       setIsModalOpen(false);
-      setPrice("");
+      setNewStatus("");
     } catch (error) {
-      console.error("Error accepting order:", error);
-      setError("Failed to place bid: " + error.message);
-    }
-  };
-
-  const handleUpdateProgress = async (orderId, progress) => {
-    try {
-      setError("");
-      setSuccess("");
-
-      if (
-        !progress ||
-        isNaN(parseInt(progress)) ||
-        parseInt(progress) < 0 ||
-        parseInt(progress) > 100
-      ) {
-        setError("Please enter a valid progress percentage (0-100)");
-        return;
-      }
-
-      const response = await fetch(
-        `${
-          import.meta.env.VITE_BACKEND_URL
-        }/api/designer/custom-orders/${orderId}/progress`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ progress: parseInt(progress) }),
-          credentials: "include",
-        }
-      );
-
-      const responseData = await response.json();
-
-      if (!response.ok) {
-        throw new Error(responseData.message || "Failed to update progress");
-      }
-
-      setSuccess("Progress updated successfully!");
-      fetchOrders();
-      setSelectedOrder(null);
-      setIsModalOpen(false);
-      setProgress("");
-    } catch (error) {
-      console.error("Error updating progress:", error);
-      setError("Failed to update progress: " + error.message);
+      console.error("Error updating order status:", error);
+      setError("Failed to update status: " + error.message);
     }
   };
 
   const getStatusBadgeColor = (status) => {
     const colors = {
-      pending: "status-badge-pending",
       accepted: "status-badge-accepted",
       in_progress: "status-badge-in-progress",
       completed: "status-badge-completed",
+      shipped: "status-badge-shipped",
+      delivered: "status-badge-delivered",
       cancelled: "status-badge-cancelled",
     };
     return colors[status] || "status-badge-default";
   };
 
+  const renderStatusOptions = () => {
+    const statusFlow = {
+      accepted: ["in_progress"],
+      in_progress: ["completed"],
+      completed: ["shipped"],
+      shipped: ["delivered"],
+    };
+
+    const currentStatus = selectedOrder ? selectedOrder.status : "";
+    const availableStatuses = statusFlow[currentStatus] || [];
+
+    return (
+      <select
+        value={newStatus}
+        onChange={(e) => setNewStatus(e.target.value)}
+        className="status-select"
+      >
+        <option value="">Select new status</option>
+        {availableStatuses.map((status) => (
+          <option key={status} value={status}>
+            {status.replace(/_/g, " ").toUpperCase()}
+          </option>
+        ))}
+      </select>
+    );
+  };
+
   return (
-    <div className="new-orders-container">
+    <div className="accepted-orders-container">
       {error && (
         <div className="error-alert">
           <div className="alert-content">
             <div className="alert-icon">
-              <svg className="error-icon" viewBox="0 0 20 20">
+              <svg
+                className="error-icon"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
                 <path
                   fillRule="evenodd"
                   d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
@@ -180,7 +156,11 @@ const NewOrders = () => {
         <div className="success-alert">
           <div className="alert-content">
             <div className="alert-icon">
-              <svg className="success-icon" viewBox="0 0 20 20">
+              <svg
+                className="success-icon"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
                 <path
                   fillRule="evenodd"
                   d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
@@ -198,14 +178,15 @@ const NewOrders = () => {
       <div className="orders-card">
         <div className="orders-header">
           <div>
-            <h2>Custom Orders Dashboard</h2>
-            <p>View and manage all custom orders</p>
+            <h2>My Accepted Orders</h2>
+            <p>View and manage all your accepted orders</p>
           </div>
-          <button onClick={fetchOrders} className="refresh-button">
+          <button onClick={fetchAcceptedOrders} className="refresh-button">
             <svg
               className="refresh-icon"
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 20 20"
+              fill="currentColor"
             >
               <path
                 fillRule="evenodd"
@@ -217,7 +198,33 @@ const NewOrders = () => {
           </button>
         </div>
 
-        {orders.length === 0 ? (
+        {loading ? (
+          <div className="loading-state">
+            <div className="spinner-container">
+              <svg
+                className="spinner"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="spinner-circle"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="spinner-path"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+              </svg>
+              <span>Loading your orders...</span>
+            </div>
+          </div>
+        ) : orders.length === 0 ? (
           <div className="empty-state">
             <svg
               className="empty-icon"
@@ -232,8 +239,8 @@ const NewOrders = () => {
                 d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
               />
             </svg>
-            <h3>No orders available</h3>
-            <p>You don't have any custom orders yet.</p>
+            <h3>No accepted orders</h3>
+            <p>You don't have any accepted orders yet.</p>
           </div>
         ) : (
           <div className="orders-grid-container">
@@ -257,17 +264,27 @@ const NewOrders = () => {
                         <p>{order.design.style}</p>
                       </div>
                       <div className="order-detail-row">
-                        <p>Fabric:</p>
-                        <p>{order.design.fabric}</p>
+                        <p>Price:</p>
+                        <p className="order-price">₹{order.price.toFixed(2)}</p>
                       </div>
+                      <div className="order-detail-row">
+                        <p>Accepted on:</p>
+                        <p>
+                          {new Date(
+                            order.acceptedAt || order.updatedAt
+                          ).toLocaleDateString()}
+                        </p>
+                      </div>
+
                       <button
                         onClick={() => {
                           setSelectedOrder(order);
                           setIsModalOpen(true);
+                          setNewStatus("");
                         }}
                         className="view-order-button"
                       >
-                        View Details
+                        View & Update Order
                       </button>
                     </div>
                   </div>
@@ -282,6 +299,7 @@ const NewOrders = () => {
       {isModalOpen && selectedOrder && (
         <div className="modal-overlay">
           <div className="modal-container">
+            {/* Modal Header */}
             <div className="modal-header">
               <div>
                 <h2>Order #{selectedOrder._id.slice(-6).toUpperCase()}</h2>
@@ -293,13 +311,21 @@ const NewOrders = () => {
                   >
                     {selectedOrder.status.replace(/_/g, " ").toUpperCase()}
                   </span>
+                  <span className="order-price-tag">
+                    ₹{selectedOrder.price.toFixed(2)}
+                  </span>
                 </div>
               </div>
               <button
                 onClick={() => setIsModalOpen(false)}
                 className="modal-close-button"
               >
-                <svg className="close-icon" viewBox="0 0 24 24">
+                <svg
+                  className="close-icon"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -310,6 +336,7 @@ const NewOrders = () => {
               </button>
             </div>
 
+            {/* Modal Content */}
             <div className="modal-content">
               <div className="modal-grid">
                 {/* Left Column: Order Summary and Customer Notes */}
@@ -325,14 +352,20 @@ const NewOrders = () => {
                           ).toLocaleDateString()}
                         </span>
                       </div>
-                      {selectedOrder.price && (
-                        <div className="info-row-total">
-                          <span>Price:</span>
-                          <span className="total-price">
-                            ₹{selectedOrder.price.toFixed(2)}
-                          </span>
-                        </div>
-                      )}
+                      <div className="info-row">
+                        <span>Accepted:</span>
+                        <span>
+                          {new Date(
+                            selectedOrder.acceptedAt || selectedOrder.updatedAt
+                          ).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <div className="info-row-total">
+                        <span>Total Price:</span>
+                        <span className="total-price">
+                          ₹{selectedOrder.price.toFixed(2)}
+                        </span>
+                      </div>
                     </div>
                   </div>
 
@@ -342,6 +375,72 @@ const NewOrders = () => {
                       <p className="customer-notes">{selectedOrder.notes}</p>
                     </div>
                   )}
+
+                  <div className="info-card">
+                    <h3>Order Timeline</h3>
+                    <div className="timeline">
+                      <div className="timeline-item">
+                        <div className="timeline-marker accepted"></div>
+                        <p className="timeline-title">Order Created</p>
+                        <p className="timeline-date">
+                          {new Date(selectedOrder.createdAt).toLocaleString()}
+                        </p>
+                      </div>
+                      <div className="timeline-item">
+                        <div className="timeline-marker accepted"></div>
+                        <p className="timeline-title">Order Accepted</p>
+                        <p className="timeline-date">
+                          {new Date(
+                            selectedOrder.acceptedAt || selectedOrder.updatedAt
+                          ).toLocaleString()}
+                        </p>
+                      </div>
+                      {selectedOrder.status === "in_progress" && (
+                        <div className="timeline-item">
+                          <div className="timeline-marker in-progress"></div>
+                          <p className="timeline-title">In Progress</p>
+                          <p className="timeline-date">
+                            Progress: {selectedOrder.progress || 0}%
+                          </p>
+                        </div>
+                      )}
+                      {selectedOrder.status === "completed" && (
+                        <div className="timeline-item">
+                          <div className="timeline-marker completed"></div>
+                          <p className="timeline-title">Completed</p>
+                          <p className="timeline-date">
+                            {new Date(
+                              selectedOrder.completedAt ||
+                                selectedOrder.updatedAt
+                            ).toLocaleString()}
+                          </p>
+                        </div>
+                      )}
+                      {selectedOrder.status === "shipped" && (
+                        <div className="timeline-item">
+                          <div className="timeline-marker shipped"></div>
+                          <p className="timeline-title">Shipped</p>
+                          <p className="timeline-date">
+                            {new Date(
+                              selectedOrder.shippedAt || selectedOrder.updatedAt
+                            ).toLocaleString()}
+                          </p>
+                        </div>
+                      )}
+                      {selectedOrder.status === "delivered" && (
+                        <div className="timeline-item">
+                          <div className="timeline-marker delivered"></div>
+                          <p className="timeline-title">Delivered</p>
+                          <p className="timeline-date">
+                            {new Date(
+                              selectedOrder.deliveredAt ||
+                                selectedOrder.updatedAt
+                            ).toLocaleString()}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
 
                 {/* Middle Column: Measurements and Design Details */}
@@ -404,47 +503,26 @@ const NewOrders = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="modal-footer">
-              {selectedOrder.status === "pending" && (
+            {selectedOrder.status !== "delivered" && (
+              <div className="modal-footer">
                 <div className="status-update-container">
-                  <input
-                    type="number"
-                    placeholder="Enter price (INR)"
-                    className="price-input"
-                    value={price}
-                    onChange={(e) => setPrice(e.target.value)}
-                  />
+                  <div className="status-select-container">
+                    {renderStatusOptions()}
+                  </div>
                   <button
-                    className="accept-order-button"
-                    onClick={() => handleAcceptOrder(selectedOrder._id, price)}
-                  >
-                    Accept Order
-                  </button>
-                </div>
-              )}
-
-              {selectedOrder.status === "in_progress" && (
-                <div className="status-update-container">
-                  <input
-                    type="number"
-                    min="0"
-                    max="100"
-                    placeholder="Update progress (%)"
-                    className="progress-input"
-                    value={progress}
-                    onChange={(e) => setProgress(e.target.value)}
-                  />
-                  <button
-                    className="update-progress-button"
+                    className={`update-status-button ${
+                      newStatus ? "active" : "disabled"
+                    }`}
                     onClick={() =>
-                      handleUpdateProgress(selectedOrder._id, progress)
+                      handleUpdateStatus(selectedOrder._id, newStatus)
                     }
+                    disabled={!newStatus}
                   >
-                    Update Progress
+                    Update Status
                   </button>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -452,4 +530,4 @@ const NewOrders = () => {
   );
 };
 
-export default NewOrders;
+export default AcceptedOrders;

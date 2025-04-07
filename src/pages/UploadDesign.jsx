@@ -19,13 +19,15 @@ const UploadDesign = () => {
   };
 
   const handleImageChange = (e) => {
-    const files = Array.from(e.target.files || e.dataTransfer.files);
+    const files = Array.from(
+      e.target.files || (e.dataTransfer && e.dataTransfer.files) || []
+    );
     setFormData((prev) => ({ ...prev, images: [...prev.images, ...files] }));
 
     files.forEach((file) => {
       const reader = new FileReader();
       reader.onload = (e) => {
-        setPreviewImages((prev) => [...prev, e.target.result]);
+        setPreviewImages((prev) => [...prev, reader.result]);
       };
       reader.readAsDataURL(file);
     });
@@ -58,6 +60,8 @@ const UploadDesign = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // Currently, this function only logs the form data to the console.
+    // You can implement the actual submission logic here.
     console.log(formData);
   };
 

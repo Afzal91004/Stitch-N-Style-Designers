@@ -5,6 +5,7 @@ import Footer from "./components/Footer";
 import DesignerDashboard from "./pages/DesignerDashboard";
 import NewOrders from "./pages/NewOrders";
 import UploadDesign from "./pages/UploadDesign";
+import AcceptedOrders from "./pages/AcceptedOrder";
 
 const App = () => {
   return (
@@ -15,6 +16,7 @@ const App = () => {
           <Route path="/designer-dashboard" element={<DesignerDashboard />} />
           <Route path="/" element={<DesignerDashboard />} />
           <Route path="/get-new-order" element={<NewOrders />} />
+          <Route path="/my-orders" element={<AcceptedOrders />} />
           <Route path="/upload-new-design" element={<UploadDesign />} />
         </Routes>
         <Footer />

@@ -16,16 +16,11 @@ import {
   DocumentTextIcon,
 } from "@heroicons/react/24/outline";
 
-// import { ShopContext } from "../context/ShopContext";
-
 const Header = () => {
   const [visible, setVisible] = useState(false);
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const dropdownRef = useRef(null);
   const buttonRef = useRef(null);
-
-  // const { setShowSearch, showSearch, getCartCount, logout } =
-  // useContext(ShopContext);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -44,13 +39,6 @@ const Header = () => {
 
   const dropdownItems = [
     { icon: <FaUser size={16} />, text: "My Profile", link: "/profile" },
-    // { icon: <FaHistory size={16} />, text: "Order History", link: "/orders" },
-    // {
-    //   icon: <FiLogOut size={16} />,
-    //   text: "Logout",
-    //   onClick: logout,
-    //   // isLogout: true,
-    // },
   ];
 
   return (
@@ -67,30 +55,32 @@ const Header = () => {
 
         {/* Navigation Links */}
         <ul className="hidden sm:flex gap-8 text-sm text-gray-700">
-          {["HOME", "GET NEW ORDER", "UPLOAD NEW DESIGN"].map((item) => (
-            <NavLink
-              key={item}
-              to={`/${
-                item === "HOME" ? "" : item.toLowerCase().replace(/ /g, "-")
-              }`}
-              className={({ isActive }) => `
+          {["HOME", "GET NEW ORDER", "MY ORDERS", "UPLOAD NEW DESIGN"].map(
+            (item) => (
+              <NavLink
+                key={item}
+                to={`/${
+                  item === "HOME" ? "" : item.toLowerCase().replace(/ /g, "-")
+                }`}
+                className={({ isActive }) => `
       flex flex-col items-center gap-1 hover:text-black transition-all duration-300
       ${isActive ? "text-black" : ""}
     `}
-            >
-              {({ isActive }) => (
-                <>
-                  <p>{item}</p>
-                  <hr
-                    className={`
+              >
+                {({ isActive }) => (
+                  <>
+                    <p>{item}</p>
+                    <hr
+                      className={`
             w-4/5 border-none h-[2px] bg-black transition-transform duration-300
             ${isActive ? "scale-x-100" : "scale-x-0"}
           `}
-                  />
-                </>
-              )}
-            </NavLink>
-          ))}
+                    />
+                  </>
+                )}
+              </NavLink>
+            )
+          )}
 
           <NavLink
             to="/designer-page"
@@ -104,13 +94,7 @@ const Header = () => {
 
         {/* Icons Section */}
         <div className="flex items-center gap-0">
-          <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-            {/* <FaSearch
-              onClick={() => setShowSearch(!showSearch)}
-              size={20}
-              className="text-gray-600 hover:text-black transition-colors"
-            /> */}
-          </button>
+          <button className="p-2 hover:bg-gray-100 rounded-full transition-colors"></button>
 
           <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
             <InboxArrowDownIcon
@@ -149,65 +133,9 @@ const Header = () => {
                 logout component <br />
                 profile <br />
                 portfolio
-                {/* {dropdownItems.map((item, index) =>
-                  item.isLogout ? (
-                    <button
-                      key={index}
-                      onClick={item.onClick}
-                      className={`
-          w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-gray-50
-          hover:text-red-700 transition-colors duration-200 text-sm
-          ${
-            index !== dropdownItems.length - 1 ? "border-b border-gray-100" : ""
-          }
-        `}
-                    >
-                      <span className="text-current">{item.icon}</span>
-                      {item.text}
-                    </button>
-                  ) : (
-                    <Link
-                      key={index}
-                      to={item.link}
-                      className={`
-          flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50
-          transition-colors duration-200 text-sm
-          ${
-            index !== dropdownItems.length - 1 ? "border-b border-gray-100" : ""
-          }
-          hover:text-black
-        `}
-                    >
-                      <span className="text-current">{item.icon}</span>
-                      {item.text}
-                    </Link>
-                  )
-                )} */}
               </div>
             </div>
           </div>
-
-          {/* Cart Icon */}
-          {/* <Link
-            to="/cart"
-            className="relative p-2 hover:bg-gray-100 rounded-full transition-colors"
-          >
-            <FaShoppingCart
-              size={20}
-              className="text-gray-600 hover:text-black transition-colors"
-            />
-            <span className="absolute right-0 top-0 w-5 h-5 flex items-center justify-center bg-black text-white text-xs rounded-full">
-              {/* {getCartCount()} */}
-          {/* </span>
-          </Link>  */}
-
-          {/* Hamburger Menu */}
-          {/* <button
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors sm:hidden"
-            onClick={() => setVisible(!visible)}
-          >
-            <GiHamburgerMenu size={20} className="text-gray-600" />
-          </button> */}
         </div>
       </div>
 
