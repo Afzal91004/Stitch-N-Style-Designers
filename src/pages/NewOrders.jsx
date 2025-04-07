@@ -9,6 +9,7 @@ const NewOrders = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!localStorage.getItem("designerId")) {
@@ -18,6 +19,7 @@ const NewOrders = () => {
 
   const fetchOrders = async () => {
     try {
+      setLoading(true);
       setError("");
       const response = await fetch(
         `${import.meta.env.VITE_BACKEND_URL}/api/designer/custom-orders`,
@@ -41,6 +43,8 @@ const NewOrders = () => {
       console.error("Error fetching orders:", error);
       setError("Failed to load orders: " + error.message);
       setOrders([]);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -217,7 +221,35 @@ const NewOrders = () => {
           </button>
         </div>
 
-        {orders.length === 0 ? (
+        {loading ? (
+          <div className="orders-grid-container">
+            <div className="orders-grid">
+              {[1, 2, 3, 4, 5, 6].map((index) => (
+                <div key={index} className="skeleton-card">
+                  <div className="skeleton-header">
+                    <div className="skeleton-title skeleton-loader"></div>
+                    <div className="skeleton-badge skeleton-loader"></div>
+                  </div>
+                  <div className="skeleton-body">
+                    <div className="skeleton-row">
+                      <div className="skeleton-label skeleton-loader"></div>
+                      <div className="skeleton-value skeleton-loader"></div>
+                    </div>
+                    <div className="skeleton-row">
+                      <div className="skeleton-label skeleton-loader"></div>
+                      <div className="skeleton-value skeleton-loader"></div>
+                    </div>
+                    <div className="skeleton-row">
+                      <div className="skeleton-label skeleton-loader"></div>
+                      <div className="skeleton-value skeleton-loader"></div>
+                    </div>
+                    <div className="skeleton-button skeleton-loader"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : orders.length === 0 ? (
           <div className="empty-state">
             <svg
               className="empty-icon"

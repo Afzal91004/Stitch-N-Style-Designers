@@ -1,6 +1,13 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 const RecentDesigns = () => {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate loading
+    setTimeout(() => setLoading(false), 2000);
+  }, []);
+
   const designs = [
     {
       id: 1,
@@ -21,6 +28,27 @@ const RecentDesigns = () => {
         "https://cdn.shopify.com/s/files/1/1732/6543/products/RedBridalLehengaPakistani_1800x1800.jpg?v=1606148986",
     },
   ];
+
+  if (loading) {
+    return (
+      <section className="mb-8">
+        <div className="skeleton h-8 w-48 mb-6"></div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
+          {[1, 2, 3].map((index) => (
+            <div key={index} className="skeleton-card">
+              <div className="p-3">
+                <div className="skeleton skeleton-image mb-4"></div>
+                <div className="space-y-3">
+                  <div className="skeleton h-5 w-24 mx-auto"></div>
+                  <div className="skeleton h-4 w-20 mx-auto opacity-60"></div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="mb-8">
