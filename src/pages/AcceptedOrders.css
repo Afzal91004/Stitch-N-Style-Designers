@@ -865,7 +865,8 @@
 
 .update-status-button.active {
   background-color: #e546d0;
-  color: rgb(23, 23, 23);
+  color: white;
+  z-index: 20;
 }
 
 .update-status-button.active:hover {
