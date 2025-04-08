@@ -894,12 +894,6 @@
   gap: 0.5rem;
 }
 
-.update-status-button.active:hover {
-  background: linear-gradient(to right, var(--primary), var(--primary-dark));
-  transform: translateY(-1px);
-  box-shadow: 0 6px 10px rgba(236, 72, 153, 0.3);
-}
-
 .update-status-button.disabled {
   background-color: var(--gray-200);
   color: var(--gray-400);
